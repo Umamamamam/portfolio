@@ -1496,7 +1496,7 @@ I’m currently open to full-time roles in AI/ML and Software Development. I’m
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>&nbsp; Sending...';
 
     try {
-      const res  = await fetch('/api/contact', {
+      const res  = await fetch('/api/server', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, subject, message })

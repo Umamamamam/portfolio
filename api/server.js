@@ -1,22 +1,11 @@
-const express    = require('express');
-const nodemailer = require('nodemailer');
-const path       = require("path");
-
-const app  = express();
-const PORT = process.env.PORT || 3000;
-
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.use(express.json());
-app.use(express.static(path.join(__dirname)));  // kept as your original
+import nodemailer from "nodemailer";
 
 // ── EMAIL CONFIG ──────────────────────────────────────────────
 
-const GMAIL_USER = 'uma932244@gmail.com';
-const GMAIL_PASS = 'sagd dlkr uucw ixdf'.replace(/\s/g, ''); // ✅ FIXED spaces
+const GMAIL_USER = process.env.GMAIL_USER;
+const GMAIL_PASS = process.env.GMAIL_PASS;
 
-// ✅ FIXED SMTP CONFIG (IMPORTANT)
+// SAME transporter
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
@@ -26,11 +15,11 @@ const transporter = nodemailer.createTransport({
     pass: GMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false   // ✅ FIX THIS LINE
+    rejectUnauthorized: false
   }
 });
 
-// ✅ Debug (added, not removing anything)
+// SAME DEBUG
 transporter.verify((err, success) => {
   if (err) {
     console.log("❌ SMTP ERROR:", err.message);
@@ -40,7 +29,13 @@ transporter.verify((err, success) => {
 });
 
 // ── CONTACT ROUTE ─────────────────────────────────────────────
-app.post('/api/contact', async (req, res) => {
+export default async function handler(req, res) {
+
+  // SAME validation style
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false });
+  }
+
   const { name, email, subject, message } = req.body;
 
   if (!name || !email || !message) {
@@ -117,14 +112,4 @@ app.post('/api/contact', async (req, res) => {
     console.error('Email error:', err.message);
     return res.status(500).json({ success: false, error: 'Failed to send email. Please try again.' });
   }
-});
-
-// ✅ Route
-app.get('/', (req, res) => {
-  res.render('index');
-});
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}`);
-  console.log(`📬 Emails will be sent to: ${GMAIL_USER}`);
-});
+}
